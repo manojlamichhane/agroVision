@@ -66,4 +66,4 @@ jobs:
         with:
           app-name: 'agrovision'
           slot-name: 'Production'
-          publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_017E5A5990654E079309C95EEC2C57AC }}
+          publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_960F95D994E5427FB485C83CE2F0A2B4 }}
