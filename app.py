@@ -2,42 +2,41 @@ import logging
 import boto3
 from botocore.exceptions import ClientError
 import os
+from pydantic import BaseModel
 
 from werkzeug.utils import secure_filename
 from dotenv import load_dotenv
 from typing import Union
-from fastapi import FastAPI
+from fastapi import FastAPI, File, UploadFile
 
 load_dotenv()
-
 app = FastAPI()
-
 fileDict = {}
+
+class Item(BaseModel):
+    Image: str
 
 @app.get("/")
 def index():
     return 'Hello world'
 
-@app.post('/upload-file')    
-def upload_file( ):
+@app.post("/uploadfile/")
+async def create_upload_file(file: UploadFile):
 
-    if 'upload_file' in request.files.keys() :
+    if file :
         
-        file_upload =  request.files['upload_file']
-        print(file_upload.filename)
-        fileDict['fileName'] = file_upload.filename
+        print(file.filename)
+        fileDict['fileName'] = file.filename
 
-        file_upload.save(secure_filename(file_upload.filename))
-
-        # Upload the file
+        # file.save(secure_filename(file.filename))
 
         s3_client = boto3.client('s3',aws_access_key_id=os.getenv("ACCESS_KEY"),aws_secret_access_key=os.getenv("SECRET_KEY"))
     
-        s3_client.upload_file(file_upload.filename, os.getenv("BUCKET"), file_upload.filename)
+        s3_client.upload_file(file.filename, os.getenv("BUCKET"), file.filename)
 
-        return jsonify({"Status" : "File uploaded successfully"})   
+        return {"Status" : "File uploaded successfully"}   
     else:
-        return jsonify({"error": "You're missing one of the following: app_secret, key_id"})
+        return {"error": "You're missing one of the following: app_secret, key_id"}
 
 @app.get('/get-label')
 def show_custom_labels():
